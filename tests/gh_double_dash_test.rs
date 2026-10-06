@@ -6,7 +6,7 @@
 
 #![cfg(unix)]
 
-use std::process::Command;
+mod common;
 
 fn shell_quote(path: &std::path::Path) -> String {
     format!("'{}'", path.display().to_string().replace('\'', "'\\''"))
@@ -38,14 +38,9 @@ fn gh_argv(args: &[&str]) -> Vec<String> {
         std::env::var("PATH").unwrap_or_default()
     );
 
-    let out = Command::new(env!("CARGO_BIN_EXE_rtk"))
+    let out = common::rtk_command()
         .env("PATH", path_with_stub)
         .env("LC_ALL", "C")
-        // Without these the run reads the developer's real config and writes to their real
-        // tracking DB. `XDG_CONFIG_HOME` too: `dirs::config_dir()` prefers it over `HOME`.
-        .env("HOME", dir.path())
-        .env("XDG_CONFIG_HOME", dir.path().join("config"))
-        .env("RTK_DB_PATH", dir.path().join("rtk.db"))
         .current_dir(dir.path())
         .args(args)
         .output()
