@@ -557,7 +557,7 @@ pub(crate) fn redirect_has_file_target(tokens: &[ParsedToken], i: usize) -> bool
 ///
 /// | | here (permission gate) | [`split_on_operators`] (analytics) | `rewrite_compound` (rewrite) |
 /// |---|---|---|---|
-/// | `&&` / `\|\|` / `;` | splits | splits | splits |
+/// | `&&` / `\|\|` / `;` / `;;` / `;&` / `;;&` | splits | splits | splits |
 /// | `\|` | always splits | stops at first `\|` | pipeline handled specially |
 /// | background `&` | splits (Shellism boundary) | does not split | splits |
 /// | `( ... )` grouping | splits (Shellism boundary) | does not split | does not split standalone |
@@ -645,7 +645,8 @@ pub fn split_for_permissions(cmd: &str) -> Vec<&str> {
     results
 }
 
-/// Split a shell command on operators (`&&`, `||`, `;`) and optionally pipes
+/// Split a shell command on operators (`&&`, `||`, `;`, and the `case`
+/// terminators `;;`, `;&`, `;;&`) and optionally pipes
 /// (`|`), quote-aware. `stop_at_pipe: true` returns only segments before the
 /// first `|` (rewrite's left-side-only case); `false` splits through pipes
 /// too (permission checking, every segment validated).
